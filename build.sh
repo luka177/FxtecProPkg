@@ -12,12 +12,21 @@ boardPkg="${board}Pkg"
 fdLocation="workspace/Build/${boardPkg}/DEBUG_GCC5/FV/MSM8998PKG_UEFI.fd"
 dtbLocation="${boardPkg}/Dtb/${board}.dtb"
 ramdiskLocation="Utilities/initrd.gz"
+xbl_path=${1:-xbl.elf}
 
 #########################################################
 # Cleanup
 if [ -f k ] ; then rm k; fi
 if [ -f boot.img ] ; then rm boot.img; fi
+if [ -f workspace/proprietary ] ; then rm -r workspace/proprietary; fi
 
+#########################################################
+# Extract xbl
+mkdir -p workspace/proprietary/xbl
+mkdir -p workspace/proprietary/section0_extracted
+uefi-firmware-parser -b -o workspace/proprietary/xbl/ -e "$xbl_path"
+7z e workspace/proprietary/xbl/volume-498048/file-9e21fd93-9c72-4c15-8c4b-e77f1db2d792/section0.guid -oworkspace/proprietary
+uefi-firmware-parser -b -o workspace/proprietary/section0_extracted/  -e workspace/proprietary/section0
 
 #########################################################
 # build
